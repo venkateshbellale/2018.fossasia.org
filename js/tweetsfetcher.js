@@ -58,7 +58,7 @@ function parser(data) {
 		} else if (words[word].startsWith("#")) {
 			parsed += "<a href='https://twitter.com/hashtag/" + words[word].slice(1) + "' target='_blank'>" + words[word] + "</a> ";
 		} else if (words[word].startsWith("http")) {
-			if (words[word].startsWith("http://loklak")) {
+			if (words[word].startsWith("https://loklak")) {
 				parsed += "<a href='" + data.statuses[tweetNum].links[loklakLinkCount] + "' target='_blank'>" + data.statuses[tweetNum].links[loklakLinkCount] + "</a> ";
 				loklakLinkCount += 1;
 			} else {
@@ -74,12 +74,12 @@ function parser(data) {
   var difference = myDate-date; //it's in miliseconds
   var difference = Math.round(difference/1000/3600/24);
   parsed += "<span class='dateTweeted'>Tweeted "+difference+" Days Ago</div>";
-  
+
 	document.getElementsByClassName("tweets-feed")[0].innerHTML =  parsed;
 	document.getElementsByClassName("tweets-feed")[0].style.opacity =  1;
 }
 
-/* Taken from https://github.com/fossasia/fossasia-loklak-webtweets/blob/gh-pages/js/loklak-fetcher.js 
+/* Taken from https://github.com/fossasia/fossasia-loklak-webtweets/blob/gh-pages/js/loklak-fetcher.js
 See documentation at https://github.com/fossasia/fossasia-loklak-webtweets
 */
 
@@ -115,7 +115,7 @@ window.onload = (function() {
       if(typeof options === 'undefined') {
         var options = {}; // Create 'options' to avoid ReferenceErrors later
       }
-      
+
       //Check if there are any data elements set
       var tweetsEl = document.getElementsByClassName("tweets-feed")[0];
       var dataset = tweetsEl.dataset;
@@ -140,18 +140,18 @@ window.onload = (function() {
       if(dataset.from) {
         query = query + "%20from:" + dataset.from;
       }
-    
-      
+
+
 
       // Write unset options as their default
       for(index in settings) {
         if(options[settings[index]] === undefined) {
           options[settings[index]] = defaults[index];
-        } 
+        }
       }
-      
+
       // Create the URL with all the parameters
-      var url = 'http://loklak.org/api/search.json' +
+      var url = 'https://loklak.org/api/search.json' +
         '?callback=loklakFetcher.handleData' +
         '&q=' + query +
         '&count=' + options.count +
