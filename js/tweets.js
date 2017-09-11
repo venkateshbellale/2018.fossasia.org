@@ -11,16 +11,18 @@ function Interval() {
 	}
 }
 
-function datafetcher() {
-	loklakFetcher.getTweets({}, datahandler);
-	Interval();
-}
-
 function datahandler(raw) {
 	stuff = raw;   //Makes the data available globally.
 	parser(stuff);
 	interval();
 }
+
+function datafetcher() {
+	loklakFetcher.getTweets({}, datahandler);
+	Interval();
+}
+
+
 
 var tweetNum = 0;
 
