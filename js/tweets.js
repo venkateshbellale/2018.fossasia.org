@@ -19,6 +19,7 @@ function datafetcher() {
 function datahandler(raw) {
 	stuff = raw;   //Makes the data available globally.
 	parser(stuff);
+	interval();
 }
 
 var tweetNum = 0;
@@ -57,7 +58,7 @@ function parser(data) {
 			parsed += "<a href='https://twitter.com/" + words[word].slice(1) + "' target='_blank'>" + words[word] + "</a> ";
 		} else if (words[word].startsWith("#")) {
 			parsed += "<a href='https://twitter.com/hashtag/" + words[word].slice(1) + "' target='_blank'>" + words[word] + "</a> ";
-		} else if (words[word].startsWith("http")) {
+		} else if (words[word].startsWith("https")) {
 			if (words[word].startsWith("https://loklak")) {
 				parsed += "<a href='" + data.statuses[tweetNum].links[loklakLinkCount] + "' target='_blank'>" + data.statuses[tweetNum].links[loklakLinkCount] + "</a> ";
 				loklakLinkCount += 1;
@@ -93,7 +94,7 @@ window.onload = (function() {
     /**
      * Fetches tweets from the public loklak API, with the options provided
      * @param  {object}   options  Object with allowed GET-attributes, see
-     *                             loklak.org/api.html
+     *                             http://api.loklak.org/
      * @param  {function} callback Function called after getting the results.
      *                             These are passed as first argument
      */
