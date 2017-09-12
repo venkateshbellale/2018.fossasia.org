@@ -5,9 +5,9 @@ var interval_id = null;
 function Interval() {
 	if (interval_id !== null){
 		clearInterval(interval_id)
-		interval_id = window.setInterval(nextTweet, 6600); //6.6 secs
+		interval_id = window.setInterval(nextTweet, 10000); //6.6 secs
 	} else{
-		interval_id = window.setInterval(nextTweet, 6600); //6.6 secs
+		interval_id = window.setInterval(nextTweet, 1000); //6.6 secs
 	}
 }
 
@@ -36,7 +36,6 @@ function nextTweet() {
 	//go back to the first tweet if it's greater than the amount of tweets available
 	if(tweetNum == tweetsEl.dataset.count) {
 		tweetNum = 0;
-	}
 	Interval();
 	document.getElementsByClassName('tweets-feed')[0].style.opacity =  0;
 	window.setTimeout(parseFunc, 560);
@@ -71,12 +70,12 @@ function parser(data) {
 			parsed += words[word] + " ";
 		}
 	}
-  var date = +new Date(data.statuses[tweetNum].created_at);
-  var myDate = new Date();
-  myDate = myDate.getTime();
-  var difference = myDate-date; //it's in miliseconds
-  var tweetAge = Math.round(difference/1000/3600) > 24 ? Math.round(difference/1000/3600/24) + " days ago" : Math.round(difference/1000/3600) + " hours ago";
-  parsed += "<span class='dateTweeted'>Tweeted "+tweetAge+"</div>";
+	var date = +new Date(data.statuses[tweetNum].created_at);
+	var myDate = new Date();
+	myDate = myDate.getTime();
+	var difference = myDate-date; //it's in miliseconds
+	var tweetAge = Math.round(difference/1000/3600) > 24 ? Math.round(difference/1000/3600/24) + " days ago" : Math.round(difference/1000/3600) + " hours ago";
+	parsed += "<span class='dateTweeted'>Tweeted "+tweetAge+"</div>";
 
 	document.getElementsByClassName("tweets-feed")[0].innerHTML =  parsed;
 	document.getElementsByClassName("tweets-feed")[0].style.opacity =  1;
@@ -90,97 +89,98 @@ See documentation at https://github.com/fossasia/fossasia-loklak-webtweets
 var loklakFetcher;
 
 window.onload = (function() {
-  var script = null;
+	var script = null;
 
-  loklakFetcher = {
-    /**
-     * Fetches tweets from the public loklak API, with the options provided
-     * @param  {object}   options  Object with allowed GET-attributes, see
-     *                             http://api.loklak.org/
-     * @param  {function} callback Function called after getting the results.
-     *                             These are passed as first argument
-     */
-    getTweets: function(options, callback) {
-      if(typeof options === 'function') { // A callback has been provided as 2nd
-                                          // argument (no options)
-        var callback = options;
-        options = {};
-      } else if(callback === undefined) { // No callback has been provided, even
-                                          // as 2nd argument
-        throw new Error('[LOKLAK-FETCHER] No callback provided');
-      }
+	loklakFetcher = {
+		/**
+		 * Fetches tweets from the public loklak API, with the options provided
+		 * @param  {object}   options  Object with allowed GET-attributes, see
+		 *                             http://api.loklak.org/
+		 * @param  {function} callback Function called after getting the results.
+		 *                             These are passed as first argument
+		 */
+		getTweets: function(options, callback) {
+			if(typeof options === 'function') { // A callback has been provided as 2nd
+																					// argument (no options)
+				var callback = options;
+				options = {};
+			} else if(callback === undefined) { // No callback has been provided, even
+																					// as 2nd argument
+				throw new Error('[LOKLAK-FETCHER] No callback provided');
+			}
 
-      var settings = [ 'count', 'source', 'tzOffset', 'minified' ];  // Field names for all the possible parameters
-      var defaults = [ 100, 'all', new Date().getTimezoneOffset(), true ];  // Default values
+			var settings = [ 'count', 'source', 'tzOffset', 'minified' ];  // Field names for all the possible parameters
+			var defaults = [ 100, 'all', new Date().getTimezoneOffset(), true ];  // Default values
 
-      // Check if no options have been provided
-      if(typeof options === 'undefined') {
-        var options = {}; // Create 'options' to avoid ReferenceErrors later
-      }
-      var query = "";
-      //Check if there are any data elements set
-      var tweetsEl = document.getElementsByClassName("tweets-feed")[0];
-      var dataset = tweetsEl.dataset;
-      if(dataset.count) {
-        options[settings[0]] = dataset.count; //count is index 0
-      }
+			// Check if no options have been provided
+			if(typeof options === 'undefined') {
+				var options = {}; // Create 'options' to avoid ReferenceErrors later
+			}
+			var query = "";
+			//Check if there are any data elements set
+			var tweetsEl = document.getElementsByClassName("tweets-feed")[0];
+			var dataset = tweetsEl.dataset;
+			if(dataset.count) {
+				options[settings[0]] = dataset.count; //count is index 0
+			}
 
-      if(dataset.query) {
-        query = dataset.query.replace(/\s/gi, '%20').replace(/#/gi, '%23'); //replace spaces and hashtags in URL
-      } else {
-        query = "";
-      }
+			if(dataset.query) {
+				query = dataset.query.replace(/\s/gi, '%20').replace(/#/gi, '%23'); //replace spaces and hashtags in URL
+			} else {
+				query = "";
+			}
 
-      if(dataset.start) {
-        query = query + "%20since:" + dataset.start;
-      }
+			if(dataset.start) {
+				query = query + "%20since:" + dataset.start;
+			}
 
-      if(dataset.end) {
-        query = query + "%20until:" + dataset.end;
-      }
+			if(dataset.end) {
+				query = query + "%20until:" + dataset.end;
+			}
 
-      if(dataset.from) {
-        var sources = dataset.from.split(',');
+			if(dataset.from) {
+				var sources = dataset.from.split(',');
 	sources.forEach(source => {
-	  query = query + "from:" + source + "%20OR%20"
+		query = query + "from:" + source + "%20OR%20"
 	})
 	query = query.substring(0, query.length - 8);
-      }
+			}
 
-      // Write unset options as their default
-      for(index in settings) {
-        if(options[settings[index]] === undefined) {
-          options[settings[index]] = defaults[index];
-        }
-      }
+			// Write unset options as their default
+			for(index in settings) {
+				if(options[settings[index]] === undefined) {
+					options[settings[index]] = defaults[index];
+				}
+			}
 
-      // Create the URL with all the parameters
-      var url = 'https://api.loklak.org/api/search.json' +
-        '?callback=loklakFetcher.handleData' +
-        '&q=' + query +
-        '&count=' + options.count +
-        '&source=' + options.source +
-        '&timezoneOffset=' + options.tzOffset +
-        '&minified=' + options.minified;
-      // If the script element for JSONP already exists, remove it
-      if(script !== null) {
-        document.head.removeChild(script);
-      }
-      /**
-       * Invokes the callback function, passing the data from the server as the
-       * first and only argument.
-       * @param  {object} data JSON coming from loklak's API
-       */
-      this.handleData = function(data) {
-        callback(data);
-      };
+			// Create the URL with all the parameters
+			var url = 'https://api.loklak.org/api/search.json' +
+				'?callback=loklakFetcher.handleData' +
+				'&q=' + query +
+				'&count=' + options.count +
+				'&source=' + options.source +
+				'&timezoneOffset=' + options.tzOffset +
+				'&minified=' + options.minified;
+			// If the script element for JSONP already exists, remove it
+			if(script !== null) {
+				document.head.removeChild(script);
+			}
+			/**
+			 * Invokes the callback function, passing the data from the server as the
+			 * first and only argument.
+			 * @param  {object} data JSON coming from loklak's API
+			 */
+			this.handleData = function(data) {
+				callback(data);
+			};
 
-      // Create the script tag for JSONP
-      script = document.createElement("script");
-      script.src = url;
-      document.head.appendChild(script);
-    }
-  };
-  datafetcher();
+			// Create the script tag for JSONP
+			script = document.createElement("script");
+			script.src = url;
+			document.head.appendChild(script);
+		}
+	};
+	datafetcher();
 
 });
+}
